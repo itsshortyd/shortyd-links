@@ -21,7 +21,26 @@ file, no build tools, no paid services. Open `index.html` in any browser to see 
 - Clicking an icon makes it glow in that platform's brand color, then opens
   your profile link in a new tab
 
-## How to run it locally
+## ⭐ The easy way to update it (Edit My Page)
+
+For the three things you change most — **profile photo**, **background image**,
+and the **bottom "new release" message** — you don't need to touch any code:
+
+1. Double-click **`Edit My Page.command`**.
+2. A little editor opens in your browser. You'll see your current photo,
+   background, and message.
+3. Drop in a new photo and/or background, type a new message — change one thing
+   or all three.
+4. Hit **Save & Publish**. It saves the files *and* pushes them to your live
+   page automatically. The live link updates in a minute or two.
+
+That's it. Close the little black Terminal window when you're done.
+
+(Under the hood that's `editor_server.py` — a tiny local helper. Photos are
+auto-resized and rotated correctly, and the live page is told to grab the new
+image right away so you don't see an old cached one.)
+
+## How to run the page itself locally
 
 Just double-click `index.html` — it opens in your default browser and works
 completely offline (aside from loading the Google Fonts, which need internet).
@@ -71,7 +90,7 @@ Just change `data-bg="..."` to the filename you dropped in. You can also edit
 the text in `data-label="..."` — that's the caption that appears under the
 orbit when that icon is active (e.g. "SPOTIFY · NEWEST TAPE").
 
-Each link also has a `data-tint="#9a4a2e"` — a hex color that the page blends
+Each link also has a `data-tint="#a02e18"` — a hex color that the page blends
 softly into its background whenever that image is showing (this is what gives
 the page its warm tint instead of staying flat white). If you swap in a new
 image with very different coloring, grab its dominant color (any color-picker

@@ -252,11 +252,13 @@
   // Swap any of these paths to point at a different cover/thumbnail.
   // Whatever isn't set falls back to DEFAULT_BG ("newest work").
   const DEFAULT_BG = 'assets/no-days-off-cover.jpg';
-  const DEFAULT_LABEL = 'NEWEST DROP — "NO DAYS OFF"';
 
   const bgA = document.getElementById('bgA');
   const bgB = document.getElementById('bgB');
   const label = document.getElementById('platformLabel');
+  // The bottom message lives in one place only: the platform-label element
+  // above. The editor edits that; this reads it back as the default caption.
+  const DEFAULT_LABEL = label.textContent.trim();
   let showingA = true;
 
   bgA.style.backgroundImage = `url('${DEFAULT_BG}')`;
