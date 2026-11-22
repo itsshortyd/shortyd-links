@@ -2,78 +2,87 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Shorty D — Official Site &amp; Hub</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shorty D — Official Site &amp; Content Hub</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;1,700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg-dark: #07080b;
-    --card-bg: rgba(18, 20, 27, 0.88);
-    --card-border: rgba(255, 255, 255, 0.12);
+    --card-bg: rgba(16, 18, 25, 0.78);
+    --card-border: rgba(255, 255, 255, 0.09);
+    --card-border-hover: rgba(255, 204, 51, 0.38);
     --ink: #f5f6f8;
     --muted: #8d93a5;
     --gold: #ffcc33;
     --gold-glow: rgba(255, 204, 51, 0.35);
-    --radius: clamp(92px, 25vw, 150px);
-    --icon-size: clamp(48px, 12vw, 62px);
+    --radius: clamp(92px, 14vw, 150px);
+    --icon-size: clamp(48px, 6vw, 62px);
     
-    /* Dynamic ambient colors */
-    --ambient-c1: rgba(255, 204, 51, 0.16);
+    /* Dynamic ambient theme colors */
+    --ambient-c1: rgba(255, 204, 51, 0.14);
     --ambient-c2: rgba(12, 14, 18, 0.96);
     --ambient-c3: #07080a;
   }
 
   * { box-sizing: border-box; }
-  
-  /* Strictly zero-scroll viewport experience */
+  html { scroll-behavior: smooth; }
+
   html, body {
     margin: 0;
     padding: 0;
-    width: 100vw;
-    height: 100vh;
-    height: 100dvh;
-    overflow: hidden;
+    min-height: 100vh;
   }
 
   body {
     font-family: 'Montserrat', sans-serif;
     color: var(--ink);
     position: relative;
-    background: radial-gradient(circle at 50% 32%, var(--ambient-c1) 0%, var(--ambient-c2) 62%, var(--ambient-c3) 100%);
+    background: radial-gradient(circle at 50% 38%, var(--ambient-c1) 0%, var(--ambient-c2) 65%, var(--ambient-c3) 100%);
     background-color: var(--bg-dark);
-    transition: background 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: background 0.55s cubic-bezier(0.16, 1, 0.3, 1);
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
+    overflow-x: hidden;
   }
 
-  /* Dynamic Whole-Background Themes on Hover / Selection */
+  @media (min-width: 1024px) {
+    body {
+      height: 100vh;
+      overflow: hidden;
+    }
+  }
+
+  /* Dynamic Theme Presets on Hover */
   body.theme-spotify {
-    --ambient-c1: rgba(30, 215, 96, 0.36);
+    --ambient-c1: rgba(30, 215, 96, 0.35);
     --ambient-c2: rgba(5, 26, 12, 0.96);
     --ambient-c3: #020a05;
   }
   body.theme-applemusic {
-    --ambient-c1: rgba(250, 35, 59, 0.36);
+    --ambient-c1: rgba(250, 35, 59, 0.35);
     --ambient-c2: rgba(38, 8, 14, 0.96);
     --ambient-c3: #0d0205;
   }
   body.theme-youtube {
-    --ambient-c1: rgba(255, 0, 0, 0.34);
+    --ambient-c1: rgba(255, 0, 0, 0.32);
     --ambient-c2: rgba(40, 6, 6, 0.96);
     --ambient-c3: #0f0202;
   }
   body.theme-instagram {
-    --ambient-c1: rgba(225, 48, 108, 0.36);
+    --ambient-c1: rgba(225, 48, 108, 0.35);
     --ambient-c2: rgba(36, 8, 32, 0.96);
     --ambient-c3: #0c020d;
   }
   body.theme-tiktok {
-    --ambient-c1: rgba(37, 244, 238, 0.32);
+    --ambient-c1: rgba(37, 244, 238, 0.3);
     --ambient-c2: rgba(5, 28, 30, 0.96);
     --ambient-c3: #010809;
+  }
+  body.theme-gold {
+    --ambient-c1: rgba(255, 204, 51, 0.28);
+    --ambient-c2: rgba(26, 21, 8, 0.96);
+    --ambient-c3: #0a0802;
   }
 
   /* Fullscreen Backdrop Crossfade */
@@ -89,12 +98,12 @@
     inset: -30px;
     background-size: cover;
     background-position: center 30%;
-    opacity: 0.18;
-    filter: blur(45px) saturate(1.5);
+    opacity: 0.16;
+    filter: blur(50px) saturate(1.5);
     transform: scale(1.1);
     transition: opacity 0.6s ease;
   }
-  .bg-a { opacity: 0.18; }
+  .bg-a { opacity: 0.16; }
   .bg-b { opacity: 0; }
 
   /* Film Grain Overlay */
@@ -107,79 +116,277 @@
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
   }
 
-  /* ---------- App Shell Layout ---------- */
-  .app-shell {
+  /* ---------- Top Navigation Bar ---------- */
+  .top-navbar {
     position: relative;
-    z-index: 2;
+    z-index: 20;
     width: 100%;
-    max-width: 540px;
-    height: 100%;
+    padding: 14px 24px;
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
     align-items: center;
-    padding: clamp(14px, 2.5vh, 24px) 16px clamp(12px, 2vh, 20px);
-    text-align: center;
+    justify-content: space-between;
+    background: rgba(10, 12, 17, 0.65);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
 
-  /* Header Section */
-  .header-group {
+  .nav-brand-title {
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 3px;
+    font-size: 17px;
+    color: var(--gold);
     display: flex;
-    flex-direction: column;
     align-items: center;
     gap: 8px;
-    flex-shrink: 0;
+    margin: 0;
+    text-shadow: 0 0 14px rgba(255, 204, 51, 0.35);
+  }
+  .nav-brand-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--gold);
+    box-shadow: 0 0 8px var(--gold);
   }
 
-  .avatar {
-    width: clamp(100px, 22vw, 150px);
-    height: clamp(100px, 22vw, 150px);
-    border-radius: 50%;
-    overflow: hidden;
-    border: 3px solid rgba(255, 204, 51, 0.7);
-    box-shadow: 0 0 28px rgba(255, 204, 51, 0.22), 0 10px 25px rgba(0, 0, 0, 0.7);
-    transition: transform 0.3s ease, border-color 0.3s ease;
+  .nav-sector-pills {
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
-  .avatar:hover {
-    transform: scale(1.03);
+  .sector-pill-btn {
+    appearance: none;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 2px;
+    font-size: 14px;
+    color: #cfd4e2;
+    padding: 7px 16px;
+    border-radius: 999px;
+    text-decoration: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .sector-pill-btn:hover {
+    color: #000;
+    background: var(--gold);
+    border-color: var(--gold);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(255, 204, 51, 0.45);
+  }
+  .sector-pill-btn.active {
+    color: #000;
+    background: var(--gold);
     border-color: var(--gold);
   }
-  .avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-  .brand-logo-wrap {
+  /* ---------- 3-Column Main Dashboard Layout ---------- */
+  .main-dashboard {
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 16px 24px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    align-items: center;
+  }
+
+  @media (min-width: 1024px) {
+    .main-dashboard {
+      grid-template-columns: 310px 1fr 310px;
+      height: calc(100vh - 72px);
+      padding: 12px 28px;
+      gap: 24px;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .main-dashboard {
+      grid-template-columns: 330px 1fr 330px;
+      gap: 32px;
+    }
+  }
+
+  /* Side Columns */
+  .side-column {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    justify-content: center;
+    z-index: 5;
+  }
+
+  @media (min-width: 1024px) {
+    .side-column {
+      height: 100%;
+      justify-content: space-between;
+      padding: 8px 0;
+    }
+  }
+
+  /* Modern Glassmorphic Cards */
+  .dash-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 18px;
+    padding: 16px 18px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    text-align: left;
+    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+  .dash-card:hover {
+    border-color: var(--card-border-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 14px 38px rgba(0, 0, 0, 0.75), 0 0 25px rgba(255, 204, 51, 0.12);
+  }
+
+  .card-label-tag {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  .card-heading {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 1.5px;
+    color: #fff;
+    margin: 0 0 6px;
+    line-height: 1.1;
+  }
+  .card-paragraph {
+    font-size: 12px;
+    color: var(--muted);
+    margin: 0 0 14px;
+    line-height: 1.5;
+  }
+
+  /* Left Side: Featured Release Card */
+  .release-widget {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    padding: 10px;
+    margin-bottom: 12px;
+  }
+  .release-cover {
+    width: 64px;
+    height: 64px;
+    border-radius: 8px;
+    overflow: hidden;
+    flex-shrink: 0;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+  }
+  .release-cover img { width: 100%; height: 100%; object-fit: cover; }
+  .release-meta { flex: 1; min-width: 0; }
+  .release-meta h4 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 19px;
+    letter-spacing: 1px;
+    color: #fff;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .release-meta span {
+    font-size: 11px;
+    color: var(--gold);
+    font-weight: 600;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .btn-stream {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-decoration: none;
+    transition: transform 0.2s ease, filter 0.2s ease;
+  }
+  .btn-stream:hover { transform: translateY(-2px); filter: brightness(1.15); }
+  .btn-stream.spotify { background: #1ED760; color: #000; }
+  .btn-stream.apple { background: #FA233B; color: #fff; }
+  .btn-stream svg { width: 13px; height: 13px; fill: currentColor; }
+
+  /* Bottom-Left: Picture of Me & Shorty D Logo Lockup */
+  .profile-badge-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: rgba(14, 16, 23, 0.85);
+    border: 1px solid rgba(255, 204, 51, 0.25);
+    border-radius: 18px;
+    padding: 12px 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 20px rgba(255, 204, 51, 0.1);
+  }
+  .profile-badge-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid var(--gold);
+    flex-shrink: 0;
+    box-shadow: 0 0 18px rgba(255, 204, 51, 0.35);
+  }
+  .profile-badge-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .profile-badge-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .badge-logo-img {
+    height: 30px;
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.8));
+    margin-bottom: 2px;
+  }
+  .badge-sub {
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 2.5px;
+    font-size: 11px;
+    color: var(--gold);
+  }
+
+  /* Center Column: The Signature Orbit */
+  .center-column {
     display: flex;
     flex-direction: column;
     align-items: center;
-  }
-  .artist-logo-img {
-    height: clamp(38px, 8vw, 54px);
-    width: auto;
-    max-width: 80vw;
-    object-fit: contain;
-    display: block;
-    filter: drop-shadow(0 3px 12px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 16px rgba(255, 204, 51, 0.25));
-  }
-  .visually-hidden {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-  }
-
-  /* Center Orbit Stage (Top Stars Hub) */
-  .orbit-wrapper {
-    flex: 1;
-    display: flex;
-    align-items: center;
     justify-content: center;
-    width: 100%;
-    min-height: 0;
     position: relative;
+    z-index: 10;
+    height: 100%;
   }
 
   .orbit {
@@ -189,6 +396,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    margin: 0 auto;
   }
 
   .orbit-track {
@@ -196,19 +404,32 @@
     inset: calc(var(--icon-size) / 2);
     border: 2px solid rgba(255, 204, 51, 0.3);
     border-radius: 50%;
-    box-shadow: 0 0 25px rgba(255, 204, 51, 0.12), inset 0 0 25px rgba(255, 204, 51, 0.08);
+    box-shadow: 0 0 25px rgba(255, 204, 51, 0.14), inset 0 0 25px rgba(255, 204, 51, 0.08);
     animation: orbitPulse 3.5s ease-in-out infinite alternate;
   }
   @keyframes orbitPulse {
-    0% { border-color: rgba(255, 204, 51, 0.22); box-shadow: 0 0 14px rgba(255, 204, 51, 0.08); }
-    100% { border-color: rgba(255, 204, 51, 0.55); box-shadow: 0 0 32px rgba(255, 204, 51, 0.32); }
+    0% { border-color: rgba(255, 204, 51, 0.22); box-shadow: 0 0 16px rgba(255, 204, 51, 0.08); }
+    100% { border-color: rgba(255, 204, 51, 0.55); box-shadow: 0 0 35px rgba(255, 204, 51, 0.35); }
   }
 
+  /* Center Emblem with subtle photo backdrop */
+  .orbit-center-disc {
+    position: relative;
+    width: clamp(140px, 18vw, 210px);
+    height: clamp(140px, 18vw, 210px);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 45px rgba(0, 0, 0, 0.85);
+  }
   .orbit-logo-img {
-    width: clamp(120px, 30vw, 180px);
+    position: relative;
+    z-index: 2;
+    width: 95%;
     height: auto;
     display: block;
-    filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.85)) drop-shadow(0 0 22px rgba(255, 204, 51, 0.25));
+    filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 24px rgba(255, 204, 51, 0.28));
     transition: transform 0.3s ease;
   }
   .orbit:hover .orbit-logo-img {
@@ -225,173 +446,109 @@
     transform: rotate(var(--angle)) translateX(var(--radius)) rotate(calc(-1 * var(--angle)));
     border-radius: 50%;
     background: var(--badge);
-    border: 3px solid rgba(255, 255, 255, 0.94);
+    border: 3px solid rgba(255, 255, 255, 0.95);
     display: flex;
     align-items: center;
     justify-content: center;
     text-decoration: none;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.65);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65);
     transition: transform .25s ease, box-shadow .25s ease, filter .25s ease;
     cursor: pointer;
+    z-index: 10;
   }
   .orbit-icon svg { width: 48%; height: 48%; display: block; fill: #fff; }
 
   .orbit-icon:hover,
-  .orbit-icon.active-node,
   .orbit-icon.glow {
     filter: brightness(1.22);
-    box-shadow: 0 0 22px 6px var(--glow), 0 0 45px 12px var(--glow);
-    transform: rotate(var(--angle)) translateX(var(--radius)) rotate(calc(-1 * var(--angle))) scale(1.2);
+    box-shadow: 0 0 24px 6px var(--glow), 0 0 50px 14px var(--glow);
+    transform: rotate(var(--angle)) translateX(var(--radius)) rotate(calc(-1 * var(--angle))) scale(1.22);
   }
 
-  /* ---------- Instant In-Place Card (Zero Scrolling) ---------- */
-  .action-deck {
-    width: 100%;
+  /* Center Status & Editor Label */
+  .center-status-badge {
+    margin-top: 20px;
+    text-align: center;
+  }
+  .platform-label {
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 4px;
+    font-size: 20px;
+    color: var(--ink);
+    margin: 0;
+    line-height: 1.2;
+    text-shadow: 0 2px 14px rgba(0,0,0,0.8);
+    transition: color 0.3s ease;
+  }
+  .center-hint {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 4px 0 0;
+  }
+
+  /* Right Side: Visuals, Feeds & Inquire */
+  .link-pill-item {
     display: flex;
-    flex-direction: column;
     align-items: center;
     gap: 12px;
-    flex-shrink: 0;
+    text-decoration: none;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 12px;
+    padding: 10px 14px;
+    margin-bottom: 8px;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
   }
-
-  .instant-card {
-    width: 100%;
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-radius: 18px;
-    padding: 12px 18px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.65), 0 0 25px rgba(255, 204, 51, 0.08);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 14px;
-    text-align: left;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-  }
-  .instant-card:hover {
+  .link-pill-item:hover {
+    background: rgba(255, 255, 255, 0.08);
     border-color: rgba(255, 204, 51, 0.4);
-    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.75), 0 0 30px rgba(255, 204, 51, 0.16);
+    transform: translateX(3px);
   }
-
-  .card-media {
-    width: 56px;
-    height: 56px;
-    border-radius: 10px;
-    overflow: hidden;
-    flex-shrink: 0;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.6);
-    background: #14161f;
+  .link-pill-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
   }
-  .card-media img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  .card-media svg {
-    width: 26px;
-    height: 26px;
-    fill: #fff;
-  }
+  .link-pill-icon.yt { background: #FF0000; }
+  .link-pill-icon.tt { background: #000; border: 1px solid #25F4EE; }
+  .link-pill-icon.ig { background: linear-gradient(135deg, #FFDC80, #E1306C, #5851DB); }
+  .link-pill-icon svg { width: 16px; height: 16px; fill: #fff; }
+  .link-pill-text { flex: 1; text-align: left; }
+  .link-pill-text strong { display: block; font-size: 13px; color: #fff; }
+  .link-pill-text span { font-size: 11px; color: var(--muted); }
+  .link-arrow { font-size: 14px; color: var(--muted); }
 
-  .card-details {
-    flex: 1;
-    min-width: 0;
+  /* Inquire / Booking Action Card */
+  .inquire-action-card {
+    background: linear-gradient(135deg, rgba(255, 204, 51, 0.08), rgba(18, 20, 27, 0.9));
+    border: 1px solid rgba(255, 204, 51, 0.3);
   }
-  .card-tag {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--gold);
-    display: block;
-    margin-bottom: 2px;
-  }
-  .card-headline {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 20px;
-    letter-spacing: 1px;
-    color: #fff;
-    margin: 0;
-    line-height: 1.1;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .card-subtext {
-    font-size: 11px;
-    color: var(--muted);
-    margin: 2px 0 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .card-action-btn {
-    display: inline-flex;
+  .btn-gold-action {
+    display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 9px 16px;
-    border-radius: 999px;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
     background: var(--gold);
     color: #000;
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.5px;
     text-decoration: none;
-    flex-shrink: 0;
-    box-shadow: 0 4px 14px rgba(255, 204, 51, 0.35);
-    transition: transform 0.2s ease, filter 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 16px rgba(255, 204, 51, 0.35);
+    transition: transform 0.2s ease, filter 0.2s ease;
   }
-  .card-action-btn:hover {
+  .btn-gold-action:hover {
     transform: translateY(-2px);
     filter: brightness(1.1);
-    box-shadow: 0 6px 18px rgba(255, 204, 51, 0.55);
-  }
-
-  /* Hidden anchor preserving editor_server.py compatibility */
-  #platformLabel {
-    display: none;
-  }
-
-  /* ---------- Modern Sector Navigation Pill Bar ---------- */
-  .sector-dock {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 5px 8px;
-    background: rgba(18, 20, 27, 0.85);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 999px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
-  }
-  .dock-tab {
-    appearance: none;
-    background: transparent;
-    border: none;
-    font-family: 'Bebas Neue', sans-serif;
-    letter-spacing: 2px;
-    font-size: 13px;
-    color: var(--muted);
-    padding: 6px 14px;
-    border-radius: 999px;
-    cursor: pointer;
-    transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease;
-  }
-  .dock-tab:hover {
-    color: #fff;
-    background: rgba(255, 255, 255, 0.08);
-  }
-  .dock-tab.active {
-    color: #000;
-    background: var(--gold);
-    box-shadow: 0 0 14px rgba(255, 204, 51, 0.4);
   }
 </style>
 </head>
@@ -405,237 +562,236 @@
     <div class="bg bg-b" id="bgB"></div>
   </div>
 
-  <div class="app-shell">
+  <!-- Top Sector Navigation Bar -->
+  <header class="top-navbar">
+    <h1 class="nav-brand-title">
+      <span class="nav-brand-dot"></span> SHORTY D &times; TOP STARS
+    </h1>
+    <nav class="nav-sector-pills" aria-label="Content Sectors">
+      <a href="#music-sector" class="sector-pill-btn active" onclick="highlightSector('music')">
+        <span>🎵</span><span>Music</span>
+      </a>
+      <a href="#visuals-sector" class="sector-pill-btn" onclick="highlightSector('visuals')">
+        <span>🎬</span><span>Visuals</span>
+      </a>
+      <a href="#feeds-sector" class="sector-pill-btn" onclick="highlightSector('feeds')">
+        <span>📱</span><span>Feeds</span>
+      </a>
+      <a href="#booking-sector" class="sector-pill-btn" onclick="highlightSector('booking')">
+        <span>⭐</span><span>Booking</span>
+      </a>
+    </nav>
+  </header>
 
-    <!-- Top Header & Avatar -->
-    <header class="header-group">
-      <div class="avatar">
-        <img src="assets/artist-photo.jpg" alt="Shorty D">
-      </div>
-      <div class="brand-logo-wrap">
-        <img src="assets/shortyd-logo.png" alt="SHORTY D" class="artist-logo-img">
-        <h1 class="visually-hidden">SHORTY D</h1>
-      </div>
-    </header>
+  <!-- 3-Column Main Dashboard Layout -->
+  <main class="main-dashboard">
 
-    <!-- Center Top Stars Orbit (Zero-Scroll Focal Point) -->
-    <div class="orbit-wrapper">
+    <!-- LEFT COLUMN: Music & Bottom-Left Profile Badge -->
+    <aside class="side-column" id="music-sector">
+
+      <!-- Music Drop Widget -->
+      <div class="dash-card">
+        <span class="card-label-tag">LATEST DROP</span>
+        <h2 class="card-heading">NO DAYS OFF</h2>
+        <div class="release-widget">
+          <div class="release-cover">
+            <img src="assets/no-days-off-cover.jpg" alt="No Days Off Cover">
+          </div>
+          <div class="release-meta">
+            <h4>No Days Off</h4>
+            <span>Single &bull; Top Stars</span>
+          </div>
+        </div>
+        <div class="btn-row">
+          <a href="https://open.spotify.com/artist/7dO0g4d6waxIT39MAuiXkV?si=YpN4woSKQDu5UJN5ZQ2qwA" target="_blank" rel="noopener" class="btn-stream spotify" onmouseenter="setTheme('spotify')" onmouseleave="resetTheme()">
+            <svg viewBox="0 0 24 24"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+            Spotify
+          </a>
+          <a href="https://music.apple.com/us/artist/shorty-d/1640313879" target="_blank" rel="noopener" class="btn-stream apple" onmouseenter="setTheme('applemusic')" onmouseleave="resetTheme()">
+            <svg viewBox="0 0 24 24"><path d="M23.994 6.124a9.23 9.23 0 00-.24-2.19c-.317-1.31-1.062-2.31-2.18-3.043a5.022 5.022 0 00-1.877-.726 10.496 10.496 0 00-1.564-.15c-.04-.003-.083-.01-.124-.013H5.986c-.152.01-.303.017-.455.026-.747.043-1.49.123-2.193.4-1.336.53-2.3 1.452-2.865 2.78-.192.448-.292.925-.363 1.408-.056.392-.088.785-.1 1.18 0 .032-.007.062-.01.093v12.223c.01.14.017.283.027.424.05.815.154 1.624.497 2.373.65 1.42 1.738 2.353 3.234 2.801.42.127.856.187 1.293.228.555.053 1.11.06 1.667.06h11.03a12.5 12.5 0 001.57-.1c.822-.106 1.596-.35 2.295-.81a5.046 5.046 0 001.88-2.207c.186-.42.293-.87.37-1.324.113-.675.138-1.358.137-2.04-.002-3.8 0-7.595-.003-11.393zm-6.423 3.99v5.712c0 .417-.058.827-.244 1.206-.29.59-.76.962-1.388 1.14-.35.1-.706.157-1.07.173-.95.045-1.773-.6-1.943-1.536a1.88 1.88 0 011.038-2.022c.323-.16.67-.25 1.018-.324.378-.082.758-.153 1.134-.24.274-.063.457-.23.51-.516a.904.904 0 00.02-.193c0-1.815 0-3.63-.002-5.443a.725.725 0 00-.026-.185c-.04-.15-.15-.243-.304-.234-.16.01-.318.035-.475.066-.76.15-1.52.303-2.28.456l-2.325.47-1.374.278c-.016.003-.032.01-.048.013-.277.077-.377.203-.39.49-.002.042 0 .086 0 .13-.002 2.602 0 5.204-.003 7.805 0 .42-.047.836-.215 1.227-.278.64-.77 1.04-1.434 1.233-.35.1-.71.16-1.075.172-.96.036-1.755-.6-1.92-1.544-.14-.812.23-1.685 1.154-2.075.357-.15.73-.232 1.108-.31.287-.06.575-.116.86-.177.383-.083.583-.323.6-.714v-.15c0-2.96 0-5.922.002-8.882 0-.123.013-.25.042-.37.07-.285.273-.448.546-.518.255-.066.515-.112.774-.165.733-.15 1.466-.296 2.2-.444l2.27-.46c.67-.134 1.34-.27 2.01-.403.22-.043.442-.088.663-.106.31-.025.523.17.554.482.008.073.012.148.012.223.002 1.91.002 3.822 0 5.732z"/></svg>
+            Apple Music
+          </a>
+        </div>
+      </div>
+
+      <!-- Bottom Left: Picture of Me and Shorty D Logo Lockup -->
+      <div class="profile-badge-card">
+        <div class="profile-badge-avatar">
+          <img src="assets/artist-photo.jpg" alt="Shorty D">
+        </div>
+        <div class="profile-badge-info">
+          <img src="assets/shortyd-logo.png" alt="SHORTY D" class="badge-logo-img">
+          <span class="badge-sub">TOP STARS &bull; EAST SIDE</span>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- CENTER COLUMN: Signature Orbit Hub -->
+    <section class="center-column">
       <div class="orbit">
         <div class="orbit-track"></div>
-        <img class="orbit-logo-img" src="assets/topstars-logo.png" alt="Top Stars emblem">
 
-        <nav class="orbit-ring" aria-label="Shorty D platforms">
+        <!-- Center Emblem -->
+        <div class="orbit-center-disc">
+          <img class="orbit-logo-img" src="assets/topstars-logo.png" alt="Top Stars emblem">
+        </div>
+
+        <nav class="orbit-ring" aria-label="Social & Streaming Links">
 
           <!-- Spotify -->
           <a class="orbit-icon" href="https://open.spotify.com/artist/7dO0g4d6waxIT39MAuiXkV?si=YpN4woSKQDu5UJN5ZQ2qwA" target="_blank" rel="noopener"
              style="--angle:-90deg; --glow:#1ED760; --badge:#1ED760"
-             data-type="spotify"
-             data-tag="STREAMING"
-             data-title='NO DAYS OFF'
-             data-sub="Stream newest drop on Spotify"
-             data-btn="Play on Spotify"
-             data-link="https://open.spotify.com/artist/7dO0g4d6waxIT39MAuiXkV?si=YpN4woSKQDu5UJN5ZQ2qwA"
-             data-bg="assets/no-days-off-cover.jpg"
-             aria-label="Spotify">
+             data-theme="spotify"
+             data-label="SPOTIFY &bull; STREAM NO DAYS OFF" data-bg="assets/no-days-off-cover.jpg" aria-label="Spotify">
             <svg viewBox="0 0 24 24"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
           </a>
 
           <!-- Apple Music -->
           <a class="orbit-icon" href="https://music.apple.com/us/artist/shorty-d/1640313879" target="_blank" rel="noopener"
              style="--angle:-18deg; --glow:#FA233B; --badge:linear-gradient(135deg,#FA8B98,#FA233B)"
-             data-type="applemusic"
-             data-tag="STREAMING"
-             data-title='NO DAYS OFF'
-             data-sub="Stream newest drop on Apple Music"
-             data-btn="Play on Apple"
-             data-link="https://music.apple.com/us/artist/shorty-d/1640313879"
-             data-bg="assets/no-days-off-cover.jpg"
-             aria-label="Apple Music">
+             data-theme="applemusic"
+             data-label="APPLE MUSIC &bull; STREAM NO DAYS OFF" data-bg="assets/no-days-off-cover.jpg" aria-label="Apple Music">
             <svg viewBox="0 0 24 24"><path d="M23.994 6.124a9.23 9.23 0 00-.24-2.19c-.317-1.31-1.062-2.31-2.18-3.043a5.022 5.022 0 00-1.877-.726 10.496 10.496 0 00-1.564-.15c-.04-.003-.083-.01-.124-.013H5.986c-.152.01-.303.017-.455.026-.747.043-1.49.123-2.193.4-1.336.53-2.3 1.452-2.865 2.78-.192.448-.292.925-.363 1.408-.056.392-.088.785-.1 1.18 0 .032-.007.062-.01.093v12.223c.01.14.017.283.027.424.05.815.154 1.624.497 2.373.65 1.42 1.738 2.353 3.234 2.801.42.127.856.187 1.293.228.555.053 1.11.06 1.667.06h11.03a12.5 12.5 0 001.57-.1c.822-.106 1.596-.35 2.295-.81a5.046 5.046 0 001.88-2.207c.186-.42.293-.87.37-1.324.113-.675.138-1.358.137-2.04-.002-3.8 0-7.595-.003-11.393zm-6.423 3.99v5.712c0 .417-.058.827-.244 1.206-.29.59-.76.962-1.388 1.14-.35.1-.706.157-1.07.173-.95.045-1.773-.6-1.943-1.536a1.88 1.88 0 011.038-2.022c.323-.16.67-.25 1.018-.324.378-.082.758-.153 1.134-.24.274-.063.457-.23.51-.516a.904.904 0 00.02-.193c0-1.815 0-3.63-.002-5.443a.725.725 0 00-.026-.185c-.04-.15-.15-.243-.304-.234-.16.01-.318.035-.475.066-.76.15-1.52.303-2.28.456l-2.325.47-1.374.278c-.016.003-.032.01-.048.013-.277.077-.377.203-.39.49-.002.042 0 .086 0 .13-.002 2.602 0 5.204-.003 7.805 0 .42-.047.836-.215 1.227-.278.64-.77 1.04-1.434 1.233-.35.1-.71.16-1.075.172-.96.036-1.755-.6-1.92-1.544-.14-.812.23-1.685 1.154-2.075.357-.15.73-.232 1.108-.31.287-.06.575-.116.86-.177.383-.083.583-.323.6-.714v-.15c0-2.96 0-5.922.002-8.882 0-.123.013-.25.042-.37.07-.285.273-.448.546-.518.255-.066.515-.112.774-.165.733-.15 1.466-.296 2.2-.444l2.27-.46c.67-.134 1.34-.27 2.01-.403.22-.043.442-.088.663-.106.31-.025.523.17.554.482.008.073.012.148.012.223.002 1.91.002 3.822 0 5.732z"/></svg>
           </a>
 
           <!-- YouTube -->
           <a class="orbit-icon" href="https://www.youtube.com/@SHORTYD" target="_blank" rel="noopener"
              style="--angle:54deg; --glow:#FF0000; --badge:#FF0000"
-             data-type="youtube"
-             data-tag="VISUALS &amp; VODS"
-             data-title="SHORTY SATURDAYS"
-             data-sub="Live studio sessions &amp; lyric breakdowns"
-             data-btn="Watch Now"
-             data-link="https://www.youtube.com/@SHORTYD"
-             data-bg="assets/no-days-off-cover.jpg"
-             aria-label="YouTube">
+             data-theme="youtube"
+             data-label="YOUTUBE &bull; WATCH SHORTY SATURDAYS" data-bg="assets/no-days-off-cover.jpg" aria-label="YouTube">
             <svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
           </a>
 
           <!-- Instagram -->
           <a class="orbit-icon" href="https://www.instagram.com/shortyd.tv/" target="_blank" rel="noopener"
              style="--angle:126deg; --glow:#E1306C; --badge:linear-gradient(135deg,#FFDC80,#FCAF45,#E1306C,#C13584,#5851DB)"
-             data-type="instagram"
-             data-tag="STORIES &amp; PHOTOS"
-             data-title="@SHORTYD.TV"
-             data-sub="Behind-the-scenes &amp; daily life"
-             data-btn="Open Instagram"
-             data-link="https://www.instagram.com/shortyd.tv/"
-             data-bg="assets/no-days-off-cover.jpg"
-             aria-label="Instagram">
+             data-theme="instagram"
+             data-label="INSTAGRAM &bull; REELS &amp; STORIES" data-bg="assets/no-days-off-cover.jpg" aria-label="Instagram">
             <svg viewBox="0 0 24 24"><path d="M7.0301.084c-1.2768.0602-2.1487.264-2.911.5634-.7888.3075-1.4575.72-2.1228 1.3877-.6652.6677-1.075 1.3368-1.3802 2.127-.2954.7638-.4956 1.6365-.552 2.914-.0564 1.2775-.0689 1.6882-.0626 4.947.0062 3.2586.0206 3.6671.0825 4.9473.061 1.2765.264 2.1482.5635 2.9107.308.7889.72 1.4573 1.388 2.1228.6679.6655 1.3365 1.0743 2.1285 1.38.7632.295 1.6361.4961 2.9134.552 1.2773.056 1.6884.069 4.9462.0627 3.2578-.0062 3.668-.0207 4.9478-.0814 1.28-.0607 2.147-.2652 2.9098-.5633.7889-.3086 1.4578-.72 2.1228-1.3881.665-.6682 1.0745-1.3378 1.3795-2.1284.2957-.7632.4966-1.636.552-2.9124.056-1.2809.0692-1.6898.063-4.948-.0063-3.2583-.021-3.6668-.0817-4.9465-.0607-1.2797-.264-2.1487-.5633-2.9117-.3084-.7889-.72-1.4568-1.3876-2.1228C21.2982 1.33 20.628.9208 19.8378.6165 19.074.321 18.2017.1197 16.9244.0645 15.6471.0093 15.236-.005 11.977.0014 8.718.0076 8.31.0215 7.0301.0839m.1402 21.6932c-1.17-.0509-1.8053-.2453-2.2287-.408-.5606-.216-.96-.4771-1.3819-.895-.422-.4178-.6811-.8186-.9-1.378-.1644-.4234-.3624-1.058-.4171-2.228-.0595-1.2645-.072-1.6442-.079-4.848-.007-3.2037.0053-3.583.0607-4.848.05-1.169.2456-1.805.408-2.2282.216-.5613.4762-.96.895-1.3816.4188-.4217.8184-.6814 1.3783-.9003.423-.1651 1.0575-.3614 2.227-.4171 1.2655-.06 1.6447-.072 4.848-.079 3.2033-.007 3.5835.005 4.8495.0608 1.169.0508 1.8053.2445 2.228.408.5608.216.96.4754 1.3816.895.4217.4194.6816.8176.9005 1.3787.1653.4217.3617 1.056.4169 2.2263.0602 1.2655.0739 1.645.0796 4.848.0058 3.203-.0055 3.5834-.061 4.848-.051 1.17-.245 1.8055-.408 2.2294-.216.5604-.4763.96-.8954 1.3814-.419.4215-.8181.6811-1.3783.9-.4224.1649-1.0577.3617-2.2262.4174-1.2656.0595-1.6448.072-4.8493.079-3.2045.007-3.5825-.006-4.848-.0608M16.953 5.5864A1.44 1.44 0 1 0 18.39 4.144a1.44 1.44 0 0 0-1.437 1.4424M5.8385 12.012c.0067 3.4032 2.7706 6.1557 6.173 6.1493 3.4026-.0065 6.157-2.7701 6.1506-6.1733-.0065-3.4032-2.771-6.1565-6.174-6.1498-3.403.0067-6.156 2.771-6.1496 6.1738M8 12.0077a4 4 0 1 1 4.008 3.9921A3.9996 3.9996 0 0 1 8 12.0077"/></svg>
           </a>
 
           <!-- TikTok -->
           <a class="orbit-icon" href="https://www.tiktok.com/@its_shortyd" target="_blank" rel="noopener"
              style="--angle:198deg; --glow:#25F4EE; --badge:#000"
-             data-type="tiktok"
-             data-tag="CLIPS &amp; REELS"
-             data-title="@ITS_SHORTYD"
-             data-sub="Viral hooks &amp; studio previews"
-             data-btn="Open TikTok"
-             data-link="https://www.tiktok.com/@its_shortyd"
-             data-bg="assets/no-days-off-cover.jpg"
-             aria-label="TikTok">
+             data-theme="tiktok"
+             data-label="TIKTOK &bull; VIRAL CLIPS &amp; DROPS" data-bg="assets/no-days-off-cover.jpg" aria-label="TikTok">
             <svg viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
           </a>
 
         </nav>
       </div>
-    </div>
 
-    <!-- Instant Action Deck (Zero Scrolling Needed) -->
-    <div class="action-deck">
-      <div class="instant-card" id="instantCard">
-        <div class="card-media" id="cardMedia">
-          <img id="cardThumb" src="assets/no-days-off-cover.jpg" alt="Artwork">
-        </div>
-        <div class="card-details">
-          <span class="card-tag" id="cardTag">FEATURED RELEASE</span>
-          <h2 class="card-headline" id="cardHeadline">NO DAYS OFF</h2>
-          <p class="card-subtext" id="cardSubtext">Stream newest single by Shorty D</p>
-        </div>
-        <a href="https://open.spotify.com/artist/7dO0g4d6waxIT39MAuiXkV?si=YpN4woSKQDu5UJN5ZQ2qwA" target="_blank" rel="noopener" class="card-action-btn" id="cardBtn">
-          <span>Stream</span> &nearr;
+      <!-- Center Status Label (Editor compatible) -->
+      <div class="center-status-badge">
+        <p class="platform-label" id="platformLabel">NEWEST DROP — "NO DAYS OFF"</p>
+        <p class="center-hint">Hover icons for ambient atmosphere &bull; Tap links to jump in</p>
+      </div>
+    </section>
+
+    <!-- RIGHT COLUMN: Visuals, Feeds & Inquiries -->
+    <aside class="side-column">
+
+      <!-- Visuals & Feeds Hub Card -->
+      <div class="dash-card" id="visuals-sector">
+        <span class="card-label-tag">VIDEO &amp; FEEDS</span>
+        <h3 class="card-heading">Visuals &amp; Clips</h3>
+
+        <!-- YouTube Link Pill -->
+        <a href="https://www.youtube.com/@SHORTYD" target="_blank" rel="noopener" class="link-pill-item" onmouseenter="setTheme('youtube')" onmouseleave="resetTheme()">
+          <div class="link-pill-icon yt">
+            <svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+          </div>
+          <div class="link-pill-text">
+            <strong>YouTube Channel</strong>
+            <span>Shorty Saturdays &amp; VODs</span>
+          </div>
+          <span class="link-arrow">&nearr;</span>
+        </a>
+
+        <!-- TikTok Link Pill -->
+        <a href="https://www.tiktok.com/@its_shortyd" id="feeds-sector" target="_blank" rel="noopener" class="link-pill-item" onmouseenter="setTheme('tiktok')" onmouseleave="resetTheme()">
+          <div class="link-pill-icon tt">
+            <svg viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
+          </div>
+          <div class="link-pill-text">
+            <strong>TikTok &bull; @its_shortyd</strong>
+            <span>Viral hooks &amp; studio takes</span>
+          </div>
+          <span class="link-arrow">&nearr;</span>
+        </a>
+
+        <!-- Instagram Link Pill -->
+        <a href="https://www.instagram.com/shortyd.tv/" target="_blank" rel="noopener" class="link-pill-item" onmouseenter="setTheme('instagram')" onmouseleave="resetTheme()">
+          <div class="link-pill-icon ig">
+            <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+          </div>
+          <div class="link-pill-text">
+            <strong>Instagram &bull; @shortyd.tv</strong>
+            <span>Studio life, stories &amp; photos</span>
+          </div>
+          <span class="link-arrow">&nearr;</span>
         </a>
       </div>
 
-      <!-- Quick Category Dock -->
-      <nav class="sector-dock" aria-label="Sectors">
-        <button class="dock-tab active" onclick="selectSector('music')">Music</button>
-        <button class="dock-tab" onclick="selectSector('visuals')">Visuals</button>
-        <button class="dock-tab" onclick="selectSector('feeds')">Feeds</button>
-        <button class="dock-tab" onclick="selectSector('booking')">Booking</button>
-      </nav>
+      <!-- Inquire & Booking Card -->
+      <div class="dash-card inquire-action-card" id="booking-sector">
+        <span class="card-label-tag">TOP STARS ENTERTAINMENT</span>
+        <h3 class="card-heading">Bookings &amp; Press</h3>
+        <p class="card-paragraph">Direct inquiries for features, live bookings, shows, press, and brand partnerships.</p>
+        <a href="mailto:booking@meeshortyd.site" class="btn-gold-action" onmouseenter="setTheme('gold')" onmouseleave="resetTheme()">
+          <span>Send Booking Inquiry</span> &nearr;
+        </a>
+      </div>
 
-      <!-- Preserved for Editor Server -->
-      <p id="platformLabel">NEWEST DROP — "NO DAYS OFF"</p>
-    </div>
+    </aside>
 
-  </div>
+  </main>
 
 <script>
-  // ---- Background & Atmosphere Setup -----------------------------------
+  // ---- Atmosphere Background & Crossfade --------------------------------
   const DEFAULT_BG = 'assets/no-days-off-cover.jpg';
   const bgA = document.getElementById('bgA');
   const bgB = document.getElementById('bgB');
+  const label = document.getElementById('platformLabel');
+  const DEFAULT_LABEL = label ? label.textContent.trim() : 'NEWEST DROP — "NO DAYS OFF"';
   let showingA = true;
+  let activeTheme = null;
+
   bgA.style.backgroundImage = `url('${DEFAULT_BG}')`;
 
-  // Elements of the Instant Action Card
-  const cardTag = document.getElementById('cardTag');
-  const cardHeadline = document.getElementById('cardHeadline');
-  const cardSubtext = document.getElementById('cardSubtext');
-  const cardBtn = document.getElementById('cardBtn');
-  const cardThumb = document.getElementById('cardThumb');
-
-  // Sector Data Presets
-  const SECTOR_DATA = {
-    music: {
-      theme: 'spotify',
-      tag: 'FEATURED DROP',
-      title: 'NO DAYS OFF',
-      sub: 'Stream newest single on Spotify & Apple',
-      btn: 'Listen Now',
-      link: 'https://open.spotify.com/artist/7dO0g4d6waxIT39MAuiXkV?si=YpN4woSKQDu5UJN5ZQ2qwA',
-      img: 'assets/no-days-off-cover.jpg'
-    },
-    visuals: {
-      theme: 'youtube',
-      tag: 'YOUTUBE & VODS',
-      title: 'SHORTY SATURDAYS',
-      sub: 'Live studio sessions & lyric breakdowns',
-      btn: 'Watch Visuals',
-      link: 'https://www.youtube.com/@SHORTYD',
-      img: 'assets/no-days-off-cover.jpg'
-    },
-    feeds: {
-      theme: 'tiktok',
-      tag: 'DAILY DROPS',
-      title: 'TIKTOK & INSTAGRAM',
-      sub: '@its_shortyd & @shortyd.tv daily clips',
-      btn: 'Watch Clips',
-      link: 'https://www.tiktok.com/@its_shortyd',
-      img: 'assets/artist-photo.jpg'
-    },
-    booking: {
-      theme: 'default',
-      tag: 'TOP STARS ENT',
-      title: 'BOOKING & PRESS',
-      sub: 'Direct inquiries, shows & features',
-      btn: 'Inquire',
-      link: 'mailto:booking@meeshortyd.site',
-      img: 'assets/topstars-logo.png'
-    }
-  };
-
-  let currentSector = 'music';
-
-  function applyState(theme, tag, title, sub, btnText, linkUrl, imgUrl) {
-    document.body.className = theme ? `theme-${theme}` : 'theme-default';
-    cardTag.textContent = tag;
-    cardHeadline.textContent = title;
-    cardSubtext.textContent = sub;
-    cardBtn.innerHTML = `<span>${btnText}</span> &nearr;`;
-    cardBtn.href = linkUrl;
-    if (imgUrl) cardThumb.src = imgUrl;
-
-    // Crossfade backdrop banner
-    const targetBg = imgUrl || DEFAULT_BG;
-    const front = showingA ? bgA : bgB;
-    const back = showingA ? bgB : bgA;
-    if (front.style.backgroundImage !== `url("${targetBg}")`) {
-      back.style.backgroundImage = `url('${targetBg}')`;
-      back.style.opacity = '0.35';
-      front.style.opacity = '0';
-      showingA = !showingA;
-    }
+  function setTheme(themeName) {
+    document.body.className = themeName ? `theme-${themeName}` : 'theme-default';
   }
 
-  function selectSector(sectorKey) {
-    currentSector = sectorKey;
-    document.querySelectorAll('.dock-tab').forEach(t => t.classList.remove('active'));
-    const btn = Array.from(document.querySelectorAll('.dock-tab')).find(b => b.textContent.toLowerCase().includes(sectorKey));
-    if (btn) btn.classList.add('active');
-
-    const d = SECTOR_DATA[sectorKey];
-    if (d) {
-      applyState(d.theme, d.tag, d.title, d.sub, d.btn, d.link, d.img);
-    }
+  function resetTheme() {
+    setTheme(activeTheme);
   }
 
-  // ---- Hover & Focus on Orbit Nodes ----
+  function highlightSector(sectorName) {
+    document.querySelectorAll('.sector-pill-btn').forEach(btn => btn.classList.remove('active'));
+    const clickedBtn = Array.from(document.querySelectorAll('.sector-pill-btn')).find(b => b.getAttribute('onclick').includes(sectorName));
+    if (clickedBtn) clickedBtn.classList.add('active');
+
+    if (sectorName === 'music') setTheme('spotify');
+    else if (sectorName === 'visuals') setTheme('youtube');
+    else if (sectorName === 'feeds') setTheme('tiktok');
+    else if (sectorName === 'booking') setTheme('gold');
+    activeTheme = document.body.className.replace('theme-', '');
+  }
+
+  // ---- Hover on Center Orbit Icons --------------------------------------
   document.querySelectorAll('.orbit-icon').forEach(icon => {
     icon.addEventListener('mouseenter', () => {
-      const type = icon.dataset.type;
-      const tag = icon.dataset.tag;
-      const title = icon.dataset.title;
-      const sub = icon.dataset.sub;
-      const btn = icon.dataset.btn;
-      const link = icon.dataset.link;
-      const bg = icon.dataset.bg;
-      applyState(type, tag, title, sub, btn, link, bg);
+      const theme = icon.dataset.theme;
+      const text = icon.dataset.label;
+      setTheme(theme);
+      if (label && text) label.innerHTML = text;
     });
 
     icon.addEventListener('mouseleave', () => {
-      // Revert to current selected sector
-      selectSector(currentSector);
+      resetTheme();
+      if (label) label.innerHTML = DEFAULT_LABEL;
     });
 
     icon.addEventListener('click', () => {
