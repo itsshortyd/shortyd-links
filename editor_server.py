@@ -39,6 +39,7 @@ PROFILE_FILE = "assets/artist-photo.jpg"
 BG_FILE = "assets/no-days-off-cover.jpg"
 PORT = 7440
 LIVE_URL = "https://itsshortyd.github.io/shortyd-links/"
+PUBLISH_FILES = ["index.html", PROFILE_FILE, BG_FILE, "assets/shortyd-logo.png"]
 
 
 # ---------------------------------------------------------------- helpers ----
@@ -131,14 +132,17 @@ def parse_multipart(body, boundary):
 def git_publish():
     """Commit and push. Returns (ok, message)."""
     try:
-        subprocess.run(["git", "-C", HERE, "add", "-A"], check=True,
-                       capture_output=True)
-        status = subprocess.run(["git", "-C", HERE, "status", "--porcelain"],
-                                capture_output=True, text=True).stdout.strip()
-        if not status:
+        # Only the files this editor writes. Anything else sitting in the
+        # repo (drafts, launcher tweaks) stays local until published on purpose.
+        subprocess.run(["git", "-C", HERE, "add", "--"] + PUBLISH_FILES,
+                       check=True, capture_output=True)
+        staged = subprocess.run(
+            ["git", "-C", HERE, "diff", "--cached", "--name-only", "--"] + PUBLISH_FILES,
+            capture_output=True, text=True).stdout.strip()
+        if not staged:
             return True, "No changes to publish — everything was already up to date."
         subprocess.run(
-            ["git", "-C", HERE, "commit", "-m", "Update page via editor"],
+            ["git", "-C", HERE, "commit", "-m", "Update page via editor", "--"] + PUBLISH_FILES,
             check=True, capture_output=True)
         push = subprocess.run(["git", "-C", HERE, "push"],
                               capture_output=True, text=True)
@@ -242,6 +246,7 @@ def editor_page():
   const status = document.getElementById('status');
   f.addEventListener('submit', async (e) => {{
     e.preventDefault();
+    if (!confirm('Publish these changes to your live page now? Anyone with the link will see them in a minute or two.')) return;
     status.className = 'busy';
     status.textContent = 'Saving and publishing…';
     try {{
