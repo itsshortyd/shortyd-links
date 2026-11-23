@@ -1,18 +1,12 @@
 #!/usr/bin/env python3
 """
-Shorty D — Page Editor
-----------------------
-A tiny local app for quickly changing the three things you touch most:
-
-  1. Profile photo (the big circle)
-  2. Background image (the banner behind everything)
-  3. Bottom message (the "NEWEST DROP ..." line)
-
-Double-click "Edit My Page.command" (or run `python3 editor_server.py`),
-make your changes in the browser, hit "Save & Publish" — it writes the
-files, commits, and pushes them live to your GitHub Pages link.
-
-No HTML editing, ever.
+Shorty D — Page Editor (Manage Me Integration)
+----------------------------------------------
+Manage your public link hub directly from Manage Me:
+  1. Latest Drop: artwork, title, subtitle, and 2 action buttons (Spotify, Apple, YouTube, etc.)
+  2. Booking & Press Email
+  3. Platforms shown in the center orbit (Spotify, Apple Music, YouTube, Instagram, TikTok)
+  4. One-click Save & Publish straight to GitHub Pages.
 """
 
 import http.server
@@ -25,6 +19,7 @@ import subprocess
 import time
 import webbrowser
 from html import escape
+from pathlib import Path
 
 try:
     from PIL import Image, ImageOps
@@ -35,11 +30,10 @@ except Exception:
 HERE = os.path.dirname(os.path.abspath(__file__))
 INDEX = os.path.join(HERE, "index.html")
 ASSETS = os.path.join(HERE, "assets")
-PROFILE_FILE = "assets/artist-photo.jpg"
-BG_FILE = "assets/no-days-off-cover.jpg"
+DROP_COVER_FILE = "assets/no-days-off-cover.jpg"
 PORT = 7440
 LIVE_URL = "https://itsshortyd.github.io/shortyd-links/"
-PUBLISH_FILES = ["index.html", PROFILE_FILE, BG_FILE, "assets/shortyd-logo.png"]
+PUBLISH_FILES = ["index.html", DROP_COVER_FILE, "assets/shortyd-logo.png"]
 
 
 # ---------------------------------------------------------------- helpers ----
@@ -53,26 +47,6 @@ def write_index(text):
         f.write(text)
 
 
-def current_message():
-    """Pull the current bottom message out of the page."""
-    m = re.search(r'id="platformLabel">(.*?)</p>', read_index(), re.S)
-    return m.group(1).strip() if m else ""
-
-
-def set_message(new_msg):
-    """Replace the bottom message (single source of truth in the HTML)."""
-    safe = escape(new_msg.strip(), quote=False)
-    html = read_index()
-    html = re.sub(
-        r'(id="platformLabel">).*?(</p>)',
-        lambda m: m.group(1) + safe + m.group(2),
-        html,
-        count=1,
-        flags=re.S,
-    )
-    write_index(html)
-
-
 def bump_cache_version(asset_path):
     """
     Add/refresh a ?v=<timestamp> on every reference to this asset so the
@@ -81,7 +55,6 @@ def bump_cache_version(asset_path):
     html = read_index()
     stamp = str(int(time.time()))
     base = re.escape(asset_path)
-    # asset_path optionally followed by ?v=NNN, inside quotes
     html = re.sub(base + r'(?:\?v=\d+)?', asset_path + "?v=" + stamp, html)
     write_index(html)
 
@@ -92,14 +65,13 @@ def save_image(raw_bytes, dest_filename):
     if HAVE_PIL:
         try:
             img = Image.open(io.BytesIO(raw_bytes))
-            img = ImageOps.exif_transpose(img)        # respect phone rotation
+            img = ImageOps.exif_transpose(img)
             img = img.convert("RGB")
-            # keep files reasonable for fast loading
             img.thumbnail((1600, 1600))
             img.save(dest, "JPEG", quality=88, optimize=True)
             return
         except Exception:
-            pass  # fall through to raw write
+            pass
     with open(dest, "wb") as f:
         f.write(raw_bytes)
 
@@ -132,8 +104,6 @@ def parse_multipart(body, boundary):
 def git_publish():
     """Commit and push. Returns (ok, message)."""
     try:
-        # Only the files this editor writes. Anything else sitting in the
-        # repo (drafts, launcher tweaks) stays local until published on purpose.
         subprocess.run(["git", "-C", HERE, "add", "--"] + PUBLISH_FILES,
                        check=True, capture_output=True)
         staged = subprocess.run(
@@ -142,9 +112,9 @@ def git_publish():
         if not staged:
             return True, "No changes to publish — everything was already up to date."
         subprocess.run(
-            ["git", "-C", HERE, "commit", "-m", "Update page via editor", "--"] + PUBLISH_FILES,
+            ["git", "-C", HERE, "commit", "-m", "Update site via Manage Me", "--"] + PUBLISH_FILES,
             check=True, capture_output=True)
-        push = subprocess.run(["git", "-C", HERE, "push"],
+        push = subprocess.run(["git", "-C", HERE, "push", "origin", "main"],
                               capture_output=True, text=True)
         if push.returncode != 0:
             return False, "Saved locally, but publish failed:\n" + push.stderr.strip()
@@ -153,102 +123,321 @@ def git_publish():
         return False, "Git error:\n" + (e.stderr.decode() if e.stderr else str(e))
 
 
+def extract_site_data():
+    """Extract all editable settings from index.html."""
+    html = read_index()
+    data = {}
+
+    # Drop Title & Subtitle
+    m = re.search(r'id="dropTitle">(.*?)</h2>', html, re.S)
+    data["drop_title"] = m.group(1).strip() if m else "NO DAYS OFF"
+
+    m = re.search(r'id="dropSubtitle">(.*?)</p>', html, re.S)
+    data["drop_subtitle"] = m.group(1).strip() if m else "Single • Available on all platforms"
+
+    # Button 1
+    m = re.search(r'id="dropBtn1Text">(.*?)</span>', html, re.S)
+    data["btn1_text"] = m.group(1).strip() if m else "Spotify"
+
+    m = re.search(r'id="dropBtn1"[^>]*href="([^"]+)"|href="([^"]+)"[^>]*id="dropBtn1"', html, re.S)
+    data["btn1_url"] = (m.group(1) or m.group(2)).strip() if m else ""
+
+    # Button 2
+    m = re.search(r'id="dropBtn2Text">(.*?)</span>', html, re.S)
+    data["btn2_text"] = m.group(1).strip() if m else "Apple Music"
+
+    m = re.search(r'id="dropBtn2"[^>]*href="([^"]+)"|href="([^"]+)"[^>]*id="dropBtn2"', html, re.S)
+    data["btn2_url"] = (m.group(1) or m.group(2)).strip() if m else ""
+
+    # Booking Email
+    m = re.search(r'id="bookingEmailText">(.*?)</span>', html, re.S)
+    data["booking_email"] = m.group(1).strip() if m else "booking@meeshortyd.site"
+
+    # Orbit Platforms
+    platforms = [
+        ("spotify", "orbitSpotify"),
+        ("applemusic", "orbitApple"),
+        ("youtube", "orbitYouTube"),
+        ("instagram", "orbitInstagram"),
+        ("tiktok", "orbitTikTok")
+    ]
+    for key, pid in platforms:
+        m = re.search(r'id="' + pid + r'"[^>]*href="([^"]+)"|href="([^"]+)"[^>]*id="' + pid + r'"', html, re.S)
+        url = (m.group(1) or m.group(2)).strip() if m else ""
+        
+        # Check if hidden
+        tag_m = re.search(r'<a[^>]*id="' + pid + r'"[^>]*>', html)
+        is_shown = True
+        if tag_m and "display:none" in tag_m.group(0):
+            is_shown = False
+            
+        data[f"{key}_url"] = url
+        data[f"{key}_show"] = is_shown
+
+    return data
+
+
+def save_site_data(fields, files):
+    """Save all form fields and uploaded artwork into index.html."""
+    html = read_index()
+
+    # Drop Artwork
+    if "drop_cover" in files and files["drop_cover"]:
+        save_image(files["drop_cover"], DROP_COVER_FILE)
+        bump_cache_version(DROP_COVER_FILE)
+        html = read_index()
+
+    # Drop Title
+    title = fields.get("drop_title", "").strip()
+    if title:
+        safe_title = escape(title)
+        html = re.sub(r'(id="dropTitle">).*?(</h2>)', r'\g<1>' + safe_title + r'\g<2>', html)
+        html = re.sub(r'(id="platformLabel">).*?(</p>)', r'\g<1>NEWEST DROP — "' + safe_title + r'"\g<2>', html)
+
+    # Drop Subtitle
+    sub = fields.get("drop_subtitle", "").strip()
+    if sub:
+        html = re.sub(r'(id="dropSubtitle">).*?(</p>)', r'\g<1>' + escape(sub) + r'\g<2>', html)
+
+    # Button 1
+    b1_text = fields.get("btn1_text", "").strip()
+    b1_url = fields.get("btn1_url", "").strip()
+    if b1_text:
+        html = re.sub(r'(id="dropBtn1Text">).*?(</span>)', r'\g<1>' + escape(b1_text) + r'\g<2>', html)
+    if b1_url:
+        html = re.sub(r'(<a\s+[^>]*id="dropBtn1"[^>]*href=")[^"]*(")', r'\g<1>' + escape(b1_url) + r'\g<2>', html)
+        html = re.sub(r'(<a\s+[^>]*href=")[^"]*("[^>]*id="dropBtn1")', r'\g<1>' + escape(b1_url) + r'\g<2>', html)
+
+    # Button 2
+    b2_text = fields.get("btn2_text", "").strip()
+    b2_url = fields.get("btn2_url", "").strip()
+    if b2_text:
+        html = re.sub(r'(id="dropBtn2Text">).*?(</span>)', r'\g<1>' + escape(b2_text) + r'\g<2>', html)
+    if b2_url:
+        html = re.sub(r'(<a\s+[^>]*id="dropBtn2"[^>]*href=")[^"]*(")', r'\g<1>' + escape(b2_url) + r'\g<2>', html)
+        html = re.sub(r'(<a\s+[^>]*href=")[^"]*("[^>]*id="dropBtn2")', r'\g<1>' + escape(b2_url) + r'\g<2>', html)
+
+    # Booking Email
+    email = fields.get("booking_email", "").strip()
+    if email:
+        safe_email = escape(email)
+        html = re.sub(r'(id="bookingEmailText">).*?(</span>)', r'\g<1>' + safe_email + r'\g<2>', html)
+        html = re.sub(r'(id="bookingLink"[^>]*href="mailto:)[^"]*(")', r'\g<1>' + safe_email + r'\g<2>', html)
+        html = re.sub(r'(href="mailto:)[^"]*("[^>]*id="bookingLink")', r'\g<1>' + safe_email + r'\g<2>', html)
+
+    # Orbit Platforms
+    platforms = [
+        ("spotify", "orbitSpotify"),
+        ("applemusic", "orbitApple"),
+        ("youtube", "orbitYouTube"),
+        ("instagram", "orbitInstagram"),
+        ("tiktok", "orbitTikTok")
+    ]
+    for key, pid in platforms:
+        url = fields.get(f"{key}_url", "").strip()
+        show = (f"{key}_show" in fields)
+        if url:
+            html = re.sub(r'(<a\s+[^>]*id="' + pid + r'"[^>]*href=")[^"]*(")', r'\g<1>' + escape(url) + r'\g<2>', html)
+            html = re.sub(r'(<a\s+[^>]*href=")[^"]*("[^>]*id="' + pid + r'")', r'\g<1>' + escape(url) + r'\g<2>', html)
+
+        def toggle_display(m):
+            tag = m.group(0)
+            if not show:
+                if 'display:none' not in tag:
+                    tag = re.sub(r'style="', 'style="display:none; ', tag)
+            else:
+                tag = re.sub(r'display:none;\s*', '', tag)
+            return tag
+
+        html = re.sub(r'<a\s+[^>]*id="' + pid + r'"[^>]*>', toggle_display, html)
+
+    write_index(html)
+
+
 # ------------------------------------------------------------------- page ----
 def editor_page():
-    msg = escape(current_message())
-    cb = int(time.time())  # cache-bust the previews in the editor itself
+    data = extract_site_data()
+    cb = int(time.time())
+
+    def checked(val):
+        return 'checked' if val else ''
+
     return f"""<!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8">
+<html lang="en" class="mm" data-area="site"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Edit Shorty D's Page</title>
+<title>Site · Manage Me</title>
+<link rel="stylesheet" href="/ui/mm.css">
+<script src="/ui/mm.js"></script>
 <style>
   * {{ box-sizing: border-box; }}
-  body {{ font-family: -apple-system, system-ui, sans-serif; margin: 0;
-         background: #14110e; color: #f6f0e4; display: flex;
-         justify-content: center; padding: 32px 16px 80px; }}
-  .wrap {{ width: 100%; max-width: 560px; }}
-  h1 {{ font-size: 26px; margin: 0 0 4px; }}
-  .sub {{ color: #b6a890; margin: 0 0 28px; font-size: 14px; }}
-  .card {{ background: #211b15; border: 1px solid #3a2f24; border-radius: 16px;
-          padding: 20px; margin-bottom: 18px; }}
-  .card h2 {{ font-size: 15px; letter-spacing: .5px; text-transform: uppercase;
-             color: #ffcc33; margin: 0 0 14px; }}
-  .row {{ display: flex; gap: 16px; align-items: center; }}
-  .thumb {{ background: #14110e; border: 1px solid #3a2f24; border-radius: 12px;
-           overflow: hidden; flex: 0 0 auto; }}
-  .thumb.circle {{ width: 96px; height: 96px; border-radius: 50%; }}
-  .thumb.banner {{ width: 160px; height: 96px; }}
+  body {{ margin: 0; background: var(--mm-bg, #0e0f12); color: var(--mm-text, #f1f1f3);
+         font-family: var(--mm-font, -apple-system, system-ui, sans-serif); }}
+  .wrap {{ max-width: 1080px; padding: 24px; margin: 0 auto; }}
+  .site-grid {{ display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 24px; align-items: start; }}
+  .card {{ margin-bottom: 20px; }}
+  .row {{ display: flex; gap: 18px; align-items: center; }}
+  .thumb {{ background: #101115; border: 1px solid var(--mm-line-2, #2a2c33); border-radius: 12px;
+           overflow: hidden; flex: 0 0 auto; width: 96px; height: 96px; }}
   .thumb img {{ width: 100%; height: 100%; object-fit: cover; display: block; }}
-  .pick {{ flex: 1; }}
-  input[type=file] {{ width: 100%; color: #b6a890; font-size: 13px; }}
-  input[type=text] {{ width: 100%; padding: 14px; font-size: 17px;
-                     background: #14110e; color: #fff; border: 1px solid #3a2f24;
-                     border-radius: 10px; }}
-  .note {{ color: #8a7c69; font-size: 12px; margin: 8px 0 0; }}
-  button {{ width: 100%; padding: 16px; font-size: 17px; font-weight: 600;
-           background: #ffcc33; color: #211b15; border: 0; border-radius: 12px;
-           cursor: pointer; margin-top: 6px; }}
-  button:active {{ transform: translateY(1px); }}
-  #status {{ margin-top: 16px; padding: 14px; border-radius: 10px; font-size: 14px;
-            white-space: pre-wrap; display: none; }}
-  #status.ok {{ background: #1d3320; color: #b8f0c0; display: block; }}
-  #status.err {{ background: #3a1d1d; color: #f0b8b8; display: block; }}
-  #status.busy {{ background: #2a2419; color: #ffcc33; display: block; }}
-  a {{ color: #ffcc33; }}
+  .pick {{ flex: 1; min-width: 0; }}
+  .pick label.mm-btn {{ cursor: pointer; }}
+  .pick input[type=file] {{ position: absolute; width: 1px; height: 1px; opacity: 0; }}
+  .fname {{ display: block; margin-top: 8px; font-size: 12px; color: var(--mm-dim, #6c707a); }}
+  
+  .form-group {{ margin-bottom: 14px; }}
+  .form-group label {{ display: block; font-size: 12px; font-weight: 600; text-transform: uppercase;
+                      letter-spacing: 0.5px; color: var(--mm-muted, #a3a7b0); margin-bottom: 6px; }}
+  input[type=text], input[type=email] {{
+    width: 100%; font-size: 14px; padding: 10px 14px; border-radius: 8px;
+    background: #14161f; border: 1px solid var(--mm-line-2, #2a2c33); color: #fff;
+  }}
+  .input-grid {{ display: grid; grid-template-columns: 140px 1fr; gap: 10px; }}
+  
+  .platform-row {{
+    display: flex; align-items: center; gap: 12px; padding: 10px 12px;
+    border-radius: 8px; background: rgba(255,255,255,0.02); margin-bottom: 8px;
+    border: 1px solid rgba(255,255,255,0.05);
+  }}
+  .platform-row input[type=checkbox] {{ width: 18px; height: 18px; cursor: pointer; }}
+  .platform-name {{ width: 100px; font-weight: 600; font-size: 13px; }}
+  .platform-input {{ flex: 1; }}
+
+  .note {{ color: var(--mm-muted, #a3a7b0); font-size: 12px; margin: 6px 0 0; line-height: 1.4; }}
+  .side .mm-card {{ position: sticky; top: 20px; }}
+  .side p {{ color: var(--mm-muted, #a3a7b0); font-size: 13px; line-height: 1.55; margin: 0 0 14px; }}
+  #status {{ margin-top: 12px; padding: 12px 14px; border-radius: 12px; font-size: 13px;
+            white-space: pre-wrap; display: none; border: 1px solid var(--mm-line-2, #2a2c33);
+            background: var(--mm-surface-2, #1d1f25); border-left-width: 3px; }}
+  #status.ok {{ display: block; border-left-color: var(--mm-green, #4cc98a); }}
+  #status.err {{ display: block; border-left-color: var(--mm-red, #f0625a); }}
+  #status.busy {{ display: block; border-left-color: var(--mm-amber, #f2b33d); }}
+  a {{ color: var(--mm-text, #f1f1f3); }}
+  @media (max-width: 860px) {{ .site-grid {{ grid-template-columns: 1fr; }} }}
 </style></head>
-<body><div class="wrap">
-  <h1>Edit Shorty D's Page</h1>
-  <p class="sub">Change a thing, hit Save &amp; Publish. That's it.
-     <a href="{LIVE_URL}" target="_blank">View live page ↗</a></p>
+<body><div class="mm-page wrap">
+  <div class="mm-head">
+    <div class="mm-head-text">
+      <div class="mm-kicker">MANAGE ME &bull; SITE</div>
+      <h1 class="mm-title" style="margin:4px 0;">Site &amp; Link Hub</h1>
+      <p class="mm-sub">Update your latest drop, change streaming buttons, customize booking email, and toggle orbit sites.</p>
+    </div>
+    <div class="mm-actions"><a class="mm-btn ghost" href="{LIVE_URL}" target="_blank">View Live Page ↗</a></div>
+  </div>
 
-  <form id="f">
-    <div class="card">
-      <h2>Profile photo</h2>
-      <div class="row">
-        <div class="thumb circle"><img id="pp" src="{PROFILE_FILE}?v={cb}"></div>
-        <div class="pick">
-          <input type="file" name="profile" accept="image/*"
-                 onchange="prev(this,'pp')">
-          <p class="note">The big circle at the top.</p>
+  <form id="f" class="mm-form site-grid">
+   <div>
+    <!-- Section 1: Latest Drop -->
+    <div class="mm-card card">
+      <div class="mm-card-title" style="font-size:16px; font-weight:700; margin-bottom:14px; color:#ffcc33;">🎵 Latest Drop</div>
+      
+      <div class="form-group">
+        <label>Drop Artwork / Cover</label>
+        <div class="row">
+          <div class="thumb"><img id="dc" src="{DROP_COVER_FILE}?v={cb}"></div>
+          <div class="pick">
+            <label class="mm-btn">Upload New Cover<input type="file" name="drop_cover" accept="image/*" onchange="prev(this,'dc')"></label>
+            <span class="fname" id="dc-name">Square artwork or video thumbnail.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Drop Title</label>
+        <input type="text" name="drop_title" value="{escape(data['drop_title'])}" placeholder="e.g. NO DAYS OFF or FEIN FOR YOUR LOVE">
+      </div>
+
+      <div class="form-group">
+        <label>Drop Subtitle / Description</label>
+        <input type="text" name="drop_subtitle" value="{escape(data['drop_subtitle'])}" placeholder="e.g. Single • Available on all platforms">
+      </div>
+
+      <div class="form-group">
+        <label>Button 1 (Label &amp; Link)</label>
+        <div class="input-grid">
+          <input type="text" name="btn1_text" value="{escape(data['btn1_text'])}" placeholder="Spotify">
+          <input type="text" name="btn1_url" value="{escape(data['btn1_url'])}" placeholder="https://open.spotify.com/artist/...">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Button 2 (Label &amp; Link)</label>
+        <div class="input-grid">
+          <input type="text" name="btn2_text" value="{escape(data['btn2_text'])}" placeholder="Apple Music or YouTube">
+          <input type="text" name="btn2_url" value="{escape(data['btn2_url'])}" placeholder="https://music.apple.com/... or https://youtube.com/...">
         </div>
       </div>
     </div>
 
-    <div class="card">
-      <h2>Background image</h2>
-      <div class="row">
-        <div class="thumb banner"><img id="bg" src="{BG_FILE}?v={cb}"></div>
-        <div class="pick">
-          <input type="file" name="background" accept="image/*"
-                 onchange="prev(this,'bg')">
-          <p class="note">The banner behind everything.</p>
-        </div>
+    <!-- Section 2: Booking & Press Email -->
+    <div class="mm-card card">
+      <div class="mm-card-title" style="font-size:16px; font-weight:700; margin-bottom:14px; color:#ffcc33;">📬 Booking &amp; Press Email</div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" name="booking_email" value="{escape(data['booking_email'])}" placeholder="yourname@gmail.com">
+        <p class="note">When visitors tap Booking &amp; Press, this email opens in their mail app. (Tip: Use a working Gmail or direct inbox until custom domain mail routing is configured).</p>
       </div>
     </div>
 
-    <div class="card">
-      <h2>Bottom message</h2>
-      <input type="text" name="message" value="{msg}"
-             placeholder='e.g. NEW SINGLE OUT NOW'>
-      <p class="note">The line under the icons (your "new release" text).</p>
-    </div>
+    <!-- Section 3: Orbit Platform Links & Toggles -->
+    <div class="mm-card card">
+      <div class="mm-card-title" style="font-size:16px; font-weight:700; margin-bottom:14px; color:#ffcc33;">🪐 Orbit Sites (The Icons Surrounding Top Stars)</div>
+      
+      <div class="platform-row">
+        <input type="checkbox" name="spotify_show" {checked(data['spotify_show'])} id="chk_sp">
+        <label for="chk_sp" class="platform-name">Spotify</label>
+        <input type="text" class="platform-input" name="spotify_url" value="{escape(data['spotify_url'])}">
+      </div>
 
-    <button type="submit">Save &amp; Publish</button>
+      <div class="platform-row">
+        <input type="checkbox" name="applemusic_show" {checked(data['applemusic_show'])} id="chk_ap">
+        <label for="chk_ap" class="platform-name">Apple Music</label>
+        <input type="text" class="platform-input" name="applemusic_url" value="{escape(data['applemusic_url'])}">
+      </div>
+
+      <div class="platform-row">
+        <input type="checkbox" name="youtube_show" {checked(data['youtube_show'])} id="chk_yt">
+        <label for="chk_yt" class="platform-name">YouTube</label>
+        <input type="text" class="platform-input" name="youtube_url" value="{escape(data['youtube_url'])}">
+      </div>
+
+      <div class="platform-row">
+        <input type="checkbox" name="instagram_show" {checked(data['instagram_show'])} id="chk_ig">
+        <label for="chk_ig" class="platform-name">Instagram</label>
+        <input type="text" class="platform-input" name="instagram_url" value="{escape(data['instagram_url'])}">
+      </div>
+
+      <div class="platform-row">
+        <input type="checkbox" name="tiktok_show" {checked(data['tiktok_show'])} id="chk_tt">
+        <label for="chk_tt" class="platform-name">TikTok</label>
+        <input type="text" class="platform-input" name="tiktok_url" value="{escape(data['tiktok_url'])}">
+      </div>
+      <p class="note">Uncheck any site you want to hide from the orbit circle.</p>
+    </div>
+   </div>
+
+   <!-- Sidebar: Publish Actions -->
+   <aside class="side"><div class="mm-card">
+    <div class="mm-card-title" style="font-weight:700; font-size:16px; margin-bottom:10px;">Save &amp; Publish</div>
+    <p>Writes your changes to the site and immediately commits and pushes them to your live GitHub repository.</p>
+    <button type="submit" class="mm-btn primary lg" style="width:100%; padding:14px; font-size:15px; font-weight:700; background:#ffcc33; color:#000; border:none; border-radius:10px; cursor:pointer;">Save &amp; Publish</button>
     <div id="status"></div>
+   </div></aside>
   </form>
 
 <script>
   function prev(input, imgId) {{
-    if (input.files && input.files[0])
+    if (input.files && input.files[0]) {{
       document.getElementById(imgId).src = URL.createObjectURL(input.files[0]);
+      document.getElementById(imgId + '-name').textContent = input.files[0].name + ' · not published yet';
+    }}
   }}
   const f = document.getElementById('f');
   const status = document.getElementById('status');
   f.addEventListener('submit', async (e) => {{
     e.preventDefault();
-    if (!confirm('Publish these changes to your live page now? Anyone with the link will see them in a minute or two.')) return;
+    if (!confirm('Publish these changes to your live page now? Your site will update in a minute or two.')) return;
     status.className = 'busy';
-    status.textContent = 'Saving and publishing…';
+    status.textContent = 'Saving and publishing to GitHub…';
     try {{
       const res = await fetch('/save', {{ method: 'POST', body: new FormData(f) }});
       const data = await res.json();
@@ -264,14 +453,35 @@ def editor_page():
 
 
 # ---------------------------------------------------------------- handler ----
+def _serve_mm_ui(h):
+    name = h.path.split("?")[0].rsplit("/", 1)[-1]
+    if name in ("mm.css", "mm.js"):
+        for up in Path(__file__).resolve().parents:
+            f = up / "ui" / name
+            if f.is_file():
+                body = f.read_bytes()
+                h.send_response(200)
+                h.send_header("Content-Type", ("text/css" if name.endswith(".css") else "application/javascript") + "; charset=utf-8")
+                h.send_header("Cache-Control", "no-cache")
+                h.send_header("Content-Length", str(len(body)))
+                h.end_headers()
+                h.wfile.write(body)
+                return
+    h.send_response(404)
+    h.send_header("Content-Length", "0")
+    h.end_headers()
+
+
 class Handler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *a, **kw):
         super().__init__(*a, directory=HERE, **kw)
 
     def log_message(self, *a):
-        pass  # quiet
+        pass
 
     def do_GET(self):
+        if self.path.startswith("/ui/"):
+            return _serve_mm_ui(self)
         if self.path == "/" or self.path.startswith("/?"):
             body = editor_page().encode("utf-8")
             self.send_response(200)
@@ -281,7 +491,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(body)
             return
-        # serve assets/index for previews, with no caching
         super().do_GET()
 
     def end_headers(self):
@@ -299,14 +508,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         fields, files = parse_multipart(body, boundary)
 
         try:
-            if "profile" in files:
-                save_image(files["profile"], PROFILE_FILE)
-                bump_cache_version(PROFILE_FILE)
-            if "background" in files:
-                save_image(files["background"], BG_FILE)
-                bump_cache_version(BG_FILE)
-            if "message" in fields:
-                set_message(fields["message"])
+            save_site_data(fields, files)
             ok, message = git_publish()
         except Exception as e:
             ok, message = False, "Error while saving: " + str(e)
