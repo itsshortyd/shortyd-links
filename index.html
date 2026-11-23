@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Shorty D — Official Site</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;1,700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;1,700&family=Permanent+Marker&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg-dark: #07080b;
@@ -16,12 +16,12 @@
     --gold: #ffcc33;
     --gold-glow: rgba(255, 204, 51, 0.35);
     
-    /* Enlarged Orbit geometry for maximum visual impact */
-    --radius: clamp(116px, 32vw, 175px);
-    --icon-size: clamp(50px, 13vw, 64px);
+    /* Orbit geometry */
+    --radius: clamp(96px, 26vw, 145px);
+    --icon-size: clamp(46px, 12vw, 58px);
 
     /* Dynamic atmosphere colors */
-    --ambient-c1: rgba(255, 204, 51, 0.16);
+    --ambient-c1: rgba(255, 204, 51, 0.14);
     --ambient-c2: rgba(12, 14, 18, 0.96);
     --ambient-c3: #07080a;
   }
@@ -41,43 +41,42 @@
     font-family: 'Montserrat', sans-serif;
     color: var(--ink);
     position: relative;
-    background: radial-gradient(circle at 50% 34%, var(--ambient-c1) 0%, var(--ambient-c2) 62%, var(--ambient-c3) 100%);
+    background: radial-gradient(circle at 50% 32%, var(--ambient-c1) 0%, var(--ambient-c2) 62%, var(--ambient-c3) 100%);
     background-color: var(--bg-dark);
     transition: background 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-between;
   }
 
-  /* Dynamic Theme Presets on Hover / Tap */
+  /* Dynamic Themes on Hover / Tap */
   body.theme-spotify {
-    --ambient-c1: rgba(30, 215, 96, 0.36);
+    --ambient-c1: rgba(30, 215, 96, 0.34);
     --ambient-c2: rgba(5, 26, 12, 0.96);
     --ambient-c3: #020a05;
   }
   body.theme-applemusic {
-    --ambient-c1: rgba(250, 35, 59, 0.36);
+    --ambient-c1: rgba(250, 35, 59, 0.34);
     --ambient-c2: rgba(38, 8, 14, 0.96);
     --ambient-c3: #0d0205;
   }
   body.theme-youtube {
-    --ambient-c1: rgba(255, 0, 0, 0.34);
+    --ambient-c1: rgba(255, 0, 0, 0.32);
     --ambient-c2: rgba(40, 6, 6, 0.96);
     --ambient-c3: #0f0202;
   }
   body.theme-instagram {
-    --ambient-c1: rgba(225, 48, 108, 0.36);
+    --ambient-c1: rgba(225, 48, 108, 0.34);
     --ambient-c2: rgba(36, 8, 32, 0.96);
     --ambient-c3: #0c020d;
   }
   body.theme-tiktok {
-    --ambient-c1: rgba(37, 244, 238, 0.32);
+    --ambient-c1: rgba(37, 244, 238, 0.28);
     --ambient-c2: rgba(5, 28, 30, 0.96);
     --ambient-c3: #010809;
   }
 
-  /* Fullscreen Ambient Backdrop Crossfade */
+  /* Fullscreen Backdrop Crossfade */
   .bg-banner {
     position: fixed;
     inset: 0;
@@ -108,7 +107,7 @@
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
   }
 
-  /* Phone Stage Wrapper */
+  /* Phone Stage Container */
   .phone-stage {
     position: relative;
     z-index: 2;
@@ -120,12 +119,60 @@
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
-    padding: clamp(24px, 4vh, 40px) 20px clamp(16px, 2.5vh, 24px);
+    padding: 16px 18px 24px;
     text-align: center;
     margin: 0 auto;
   }
 
-  /* Center Orbit (Enlarged Top Stars Focal Point) */
+  /* ---------- Cinematic Photo Header with Shorty D Lettering ---------- */
+  .header-hero {
+    width: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 4px;
+  }
+  .header-photo-wrap {
+    position: relative;
+    width: 100%;
+    height: clamp(190px, 48vw, 255px);
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+  }
+  .header-photo-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 25%;
+    display: block;
+    filter: contrast(1.08) brightness(0.98);
+  }
+  .header-fade-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg,
+      rgba(7, 8, 11, 0.05) 0%,
+      rgba(7, 8, 11, 0.15) 35%,
+      rgba(7, 8, 11, 0.72) 75%,
+      var(--bg-dark) 100%);
+    pointer-events: none;
+  }
+  .artist-name {
+    font-family: 'Permanent Marker', cursive;
+    font-size: clamp(40px, 11vw, 56px);
+    line-height: 1;
+    letter-spacing: 2px;
+    color: #fff;
+    margin: -26px 0 2px;
+    position: relative;
+    z-index: 5;
+    text-shadow: 0 4px 18px rgba(0, 0, 0, 0.95), 0 0 30px rgba(255, 204, 51, 0.35);
+  }
+
+  /* ---------- Top Stars Orbit Centerpiece ---------- */
   .orbit-area {
     flex: 1;
     display: flex;
@@ -133,7 +180,7 @@
     align-items: center;
     justify-content: center;
     width: 100%;
-    padding: clamp(10px, 2vh, 24px) 0;
+    padding: 6px 0 10px;
   }
 
   .orbit {
@@ -151,20 +198,19 @@
     inset: calc(var(--icon-size) / 2);
     border: 2px solid rgba(255, 204, 51, 0.35);
     border-radius: 50%;
-    box-shadow: 0 0 28px rgba(255, 204, 51, 0.16), inset 0 0 28px rgba(255, 204, 51, 0.1);
+    box-shadow: 0 0 26px rgba(255, 204, 51, 0.16), inset 0 0 26px rgba(255, 204, 51, 0.1);
     animation: orbitPulse 3.5s ease-in-out infinite alternate;
   }
   @keyframes orbitPulse {
     0% { border-color: rgba(255, 204, 51, 0.22); box-shadow: 0 0 16px rgba(255, 204, 51, 0.08); }
-    100% { border-color: rgba(255, 204, 51, 0.62); box-shadow: 0 0 38px rgba(255, 204, 51, 0.4); }
+    100% { border-color: rgba(255, 204, 51, 0.62); box-shadow: 0 0 36px rgba(255, 204, 51, 0.4); }
   }
 
-  /* Bigger Center Top Stars Emblem */
   .orbit-center-logo {
-    width: clamp(165px, 46vw, 230px);
+    width: clamp(130px, 35vw, 185px);
     height: auto;
     display: block;
-    filter: drop-shadow(0 14px 32px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 32px rgba(255, 204, 51, 0.35));
+    filter: drop-shadow(0 12px 28px rgba(0, 0, 0, 0.88)) drop-shadow(0 0 28px rgba(255, 204, 51, 0.3));
     transition: transform 0.3s ease;
   }
   .orbit:hover .orbit-center-logo {
@@ -202,17 +248,17 @@
 
   /* Platform message under orbit (Editor compatible) */
   .platform-label {
-    margin-top: clamp(16px, 3vh, 26px);
+    margin-top: clamp(12px, 2vh, 18px);
     font-family: 'Bebas Neue', sans-serif;
     letter-spacing: 3.5px;
-    font-size: 20px;
+    font-size: 19px;
     color: var(--ink);
     min-height: 1.3em;
     text-shadow: 0 2px 14px rgba(0,0,0,0.8);
     transition: color 0.3s ease;
   }
 
-  /* Latest Drop Section */
+  /* ---------- Latest Drop Section ---------- */
   .drop-section {
     width: 100%;
     background: var(--card-bg);
@@ -222,7 +268,7 @@
     border-radius: 20px;
     padding: 14px 16px;
     box-shadow: 0 12px 35px rgba(0, 0, 0, 0.65), 0 0 25px rgba(255, 204, 51, 0.08);
-    margin-bottom: 14px;
+    margin-bottom: 12px;
     text-align: left;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
   }
@@ -238,8 +284,8 @@
     margin-bottom: 12px;
   }
   .drop-thumb-wrap {
-    width: 64px;
-    height: 64px;
+    width: 62px;
+    height: 62px;
     border-radius: 10px;
     overflow: hidden;
     flex-shrink: 0;
@@ -320,7 +366,7 @@
   }
   .drop-btn svg { width: 14px; height: 14px; fill: currentColor; }
 
-  /* Bottom Booking & Press (No Emojis) */
+  /* ---------- Booking & Press (No Emojis) ---------- */
   .bottom-booking {
     width: 100%;
     margin-top: 2px;
@@ -376,12 +422,21 @@
 
   <main class="phone-stage">
 
-    <!-- Center Orbit (Top Stars Centerpiece - Enlarged) -->
+    <!-- Cinematic Header: Photo with Gradient Fade & Signature Permanent Marker Script -->
+    <header class="header-hero">
+      <div class="header-photo-wrap">
+        <img src="assets/header-photo.jpg" alt="Shorty D" class="header-photo-img" id="headerPhotoImg">
+        <div class="header-fade-overlay"></div>
+      </div>
+      <h1 class="artist-name">SHORTY D</h1>
+    </header>
+
+    <!-- Center Orbit (Top Stars Centerpiece) -->
     <section class="orbit-area">
       <div class="orbit">
         <div class="orbit-track"></div>
 
-        <!-- Center Emblem (Bigger Top Stars Logo) -->
+        <!-- Center Emblem -->
         <img class="orbit-center-logo" src="assets/topstars-logo.png" alt="Top Stars emblem">
 
         <nav class="orbit-ring" aria-label="Social & Streaming Links">
@@ -429,11 +484,11 @@
         </nav>
       </div>
 
-      <!-- Active Label (Editor compatible) -->
+      <!-- Active Platform Label (Editor compatible) -->
       <p class="platform-label" id="platformLabel">NEWEST DROP — "NO DAYS OFF"</p>
     </section>
 
-    <!-- Latest Drop Section with 2 Direct Buttons -->
+    <!-- Latest Drop Section -->
     <section class="drop-section" id="dropSection">
       <div class="drop-main-row">
         <div class="drop-thumb-wrap">
@@ -449,10 +504,6 @@
       <div class="drop-buttons-row">
         <a href="https://open.spotify.com/artist/7dO0g4d6waxIT39MAuiXkV?si=YpN4woSKQDu5UJN5ZQ2qwA" target="_blank" rel="noopener" class="drop-btn btn-primary" id="dropBtn1" onmouseenter="setTheme('spotify')" onmouseleave="resetTheme()">
           <svg viewBox="0 0 24 24"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
-          <span id="dropBtn1Text">Spotify</span>
-        </a>
-        <a href="https://music.apple.com/us/artist/shorty-d/1640313879" target="_blank" rel="noopener" class="drop-btn btn-secondary" id="dropBtn2" onmouseenter="setTheme('applemusic')" onmouseleave="resetTheme()">
-          <svg viewBox="0 0 24 24"><path d="M23.994 6.124a9.23 9.23 0 00-.24-2.19c-.317-1.31-1.062-2.31-2.18-3.043a5.022 5.022 0 00-1.877-.726 10.496 10.496 0 00-1.564-.15c-.04-.003-.083-.01-.124-.013H5.986c-.152.01-.303.017-.455.026-.747.043-1.49.123-2.193.4-1.336.53-2.3 1.452-2.865 2.78-.192.448-.292.925-.363 1.408-.056.392-.088.785-.1 1.18 0 .032-.007.062-.01.093v12.223c.01.14.017.283.027.424.05.815.154 1.624.497 2.373.65 1.42 1.738 2.353 3.234 2.801.42.127.856.187 1.293.228.555.053 1.11.06 1.667.06h11.03a12.5 12.5 0 001.57-.1c.822-.106 1.596-.35 2.295-.81a5.046 5.046 0 001.88-2.207c.186-.42.293-.87.37-1.324.113-.675.138-1.358.137-2.04-.002-3.8 0-7.595-.003-11.393zm-6.423 3.99v5.712c0 .417-.058.827-.244 1.206-.29.59-.76.962-1.388 1.14-.35.1-.706.157-1.07.173-.95.045-1.773-.6-1.943-1.536a1.88 1.88 0 011.038-2.022c.323-.16.67-.25 1.018-.324.378-.082.758-.153 1.134-.24.274-.063.457-.23.51-.516a.904.904 0 00.02-.193c0-1.815 0-3.63-.002-5.443a.725.725 0 00-.026-.185c-.04-.15-.15-.243-.304-.234-.16.01-.318.035-.475.066-.76.15-1.52.303-2.28.456l-2.325.47-1.374.278c-.016.003-.032.01-.048.013-.277.077-.377.203-.39.49-.002.042 0 .086 0 .13-.002 2.602 0 5.204-.003 7.805 0 .42-.047.836-.215 1.227-.278.64-.77 1.04-1.434 1.233-.35.1-.71.16-1.075.172-.96.036-1.755-.6-1.92-1.544-.14-.812.23-1.685 1.154-2.075.357-.15.73-.232 1.108-.31.287-.06.575-.116.86-.177.383-.083.583-.323.6-.714v-.15c0-2.96 0-5.922.002-8.882 0-.123.013-.25.042-.37.07-.285.273-.448.546-.518.255-.066.515-.112.774-.165.733-.15 1.466-.296 2.2-.444l2.27-.46c.67-.134 1.34-.27 2.01-.403.22-.043.442-.088.663-.106.31-.025.523.17.554.482.008.073.012.148.012.223.002 1.91.002 3.822 0 5.732z"/></svg>
           <span id="dropBtn1Text">Spotify</span>
         </a>
         <a href="https://music.apple.com/us/artist/shorty-d/1640313879" target="_blank" rel="noopener" class="drop-btn btn-secondary" id="dropBtn2" onmouseenter="setTheme('applemusic')" onmouseleave="resetTheme()">

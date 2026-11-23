@@ -3,10 +3,11 @@
 Shorty D — Page Editor (Manage Me Integration)
 ----------------------------------------------
 Manage your public link hub directly from Manage Me:
-  1. Latest Drop: artwork, title, subtitle, and 2 action buttons (Spotify, Apple, YouTube, etc.)
-  2. Booking & Press Email
-  3. Platforms shown in the center orbit (Spotify, Apple Music, YouTube, Instagram, TikTok)
-  4. One-click Save & Publish straight to GitHub Pages.
+  1. Header Photo: the cinematic banner photo at the top of your page
+  2. Latest Drop: artwork, title, subtitle, and 2 action buttons (Spotify, Apple, YouTube, etc.)
+  3. Booking & Press Email
+  4. Platforms shown in the center orbit (Spotify, Apple Music, YouTube, Instagram, TikTok)
+  5. One-click Save & Publish straight to GitHub Pages.
 """
 
 import http.server
@@ -31,9 +32,10 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 INDEX = os.path.join(HERE, "index.html")
 ASSETS = os.path.join(HERE, "assets")
 DROP_COVER_FILE = "assets/no-days-off-cover.jpg"
+HEADER_PHOTO_FILE = "assets/header-photo.jpg"
 PORT = 7440
 LIVE_URL = "https://itsshortyd.github.io/shortyd-links/"
-PUBLISH_FILES = ["index.html", DROP_COVER_FILE, "assets/shortyd-logo.png"]
+PUBLISH_FILES = ["index.html", DROP_COVER_FILE, HEADER_PHOTO_FILE, "assets/shortyd-logo.png"]
 
 
 # ---------------------------------------------------------------- helpers ----
@@ -151,7 +153,7 @@ def extract_site_data():
 
     # Booking Email
     m = re.search(r'id="bookingEmailText">(.*?)</span>', html, re.S)
-    data["booking_email"] = m.group(1).strip() if m else "booking@meeshortyd.site"
+    data["booking_email"] = m.group(1).strip() if m else "itsshortyd@gmail.com"
 
     # Orbit Platforms
     platforms = [
@@ -180,6 +182,12 @@ def extract_site_data():
 def save_site_data(fields, files):
     """Save all form fields and uploaded artwork into index.html."""
     html = read_index()
+
+    # Header Photo
+    if "header_photo" in files and files["header_photo"]:
+        save_image(files["header_photo"], HEADER_PHOTO_FILE)
+        bump_cache_version(HEADER_PHOTO_FILE)
+        html = read_index()
 
     # Drop Artwork
     if "drop_cover" in files and files["drop_cover"]:
@@ -278,6 +286,7 @@ def editor_page():
   .row {{ display: flex; gap: 18px; align-items: center; }}
   .thumb {{ background: #101115; border: 1px solid var(--mm-line-2, #2a2c33); border-radius: 12px;
            overflow: hidden; flex: 0 0 auto; width: 96px; height: 96px; }}
+  .thumb.banner {{ width: 140px; height: 80px; }}
   .thumb img {{ width: 100%; height: 100%; object-fit: cover; display: block; }}
   .pick {{ flex: 1; min-width: 0; }}
   .pick label.mm-btn {{ cursor: pointer; }}
@@ -319,14 +328,29 @@ def editor_page():
     <div class="mm-head-text">
       <div class="mm-kicker">MANAGE ME &bull; SITE</div>
       <h1 class="mm-title" style="margin:4px 0;">Site &amp; Link Hub</h1>
-      <p class="mm-sub">Update your latest drop, change streaming buttons, customize booking email, and toggle orbit sites.</p>
+      <p class="mm-sub">Update your header photo, change your latest drop, customize booking email, and toggle orbit sites.</p>
     </div>
     <div class="mm-actions"><a class="mm-btn ghost" href="{LIVE_URL}" target="_blank">View Live Page ↗</a></div>
   </div>
 
   <form id="f" class="mm-form site-grid">
    <div>
-    <!-- Section 1: Latest Drop -->
+    <!-- Section 1: Top Header Photo -->
+    <div class="mm-card card">
+      <div class="mm-card-title" style="font-size:16px; font-weight:700; margin-bottom:14px; color:#ffcc33;">📸 Top Header Photo</div>
+      <div class="form-group">
+        <label>Cinematic Banner Photo</label>
+        <div class="row">
+          <div class="thumb banner"><img id="hp" src="{HEADER_PHOTO_FILE}?v={cb}"></div>
+          <div class="pick">
+            <label class="mm-btn">Upload New Header Photo<input type="file" name="header_photo" accept="image/*" onchange="prev(this,'hp')"></label>
+            <span class="fname" id="hp-name">High-contrast photo fading into the Top Stars ecosystem.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2: Latest Drop -->
     <div class="mm-card card">
       <div class="mm-card-title" style="font-size:16px; font-weight:700; margin-bottom:14px; color:#ffcc33;">🎵 Latest Drop</div>
       
@@ -368,17 +392,17 @@ def editor_page():
       </div>
     </div>
 
-    <!-- Section 2: Booking & Press Email -->
+    <!-- Section 3: Booking & Press Email -->
     <div class="mm-card card">
       <div class="mm-card-title" style="font-size:16px; font-weight:700; margin-bottom:14px; color:#ffcc33;">📬 Booking &amp; Press Email</div>
       <div class="form-group">
         <label>Email Address</label>
-        <input type="email" name="booking_email" value="{escape(data['booking_email'])}" placeholder="yourname@gmail.com">
-        <p class="note">When visitors tap Booking &amp; Press, this email opens in their mail app. (Tip: Use a working Gmail or direct inbox until custom domain mail routing is configured).</p>
+        <input type="email" name="booking_email" value="{escape(data['booking_email'])}" placeholder="itsshortyd@gmail.com">
+        <p class="note">When visitors tap Booking &amp; Press, this email opens in their mail app.</p>
       </div>
     </div>
 
-    <!-- Section 3: Orbit Platform Links & Toggles -->
+    <!-- Section 4: Orbit Platform Links & Toggles -->
     <div class="mm-card card">
       <div class="mm-card-title" style="font-size:16px; font-weight:700; margin-bottom:14px; color:#ffcc33;">🪐 Orbit Sites (The Icons Surrounding Top Stars)</div>
       
